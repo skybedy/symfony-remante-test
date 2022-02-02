@@ -1,0 +1,81 @@
+{% extends 'base.html.twig' %}
+
+{% block vyrobce %}
+        {% for vyrobce in vyrobce_list %}
+            <option value="{{ vyrobce.vyrobce_id }}" {{vyrobce.vyrobce_id == vyrobce_id ? ' selected ' : '' }}>{{ vyrobce.vyrobce_nazev }}</option>
+        {% endfor %}
+{% endblock %}
+
+{% block typ_produktu %}
+        {% for typ_produktu in typ_produktu_list %}
+            <option value="{{ typ_produktu.typ_produktu_id }}" {{typ_produktu.typ_produktu_id == typ_produktu_id ? ' selected ' : '' }}>{{ typ_produktu.typ_produktu_nazev }}</option>
+        {% endfor %}
+{% endblock %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+<div id="product_table">
+  <table class="table">
+      <template v-if="blokBasicTable">
+            <thead>
+              <tr>
+                <th scope="col"><a href="/produkty" @click.prevent="productListXhr({{typ_produktu_id}},{{vyrobce_id}},'produkt_nazev',0)">Název</a></th>
+                <th scope="col"><a href="/produkty" @click.prevent="productListXhr({{typ_produktu_id}},{{vyrobce_id}},'produkt_cena',0)">Cena</a></th>
+                <th scope="col">&nbsp;</th>
+              </tr>
+            </thead> 
+            <tbody>
+
+          {% for produkt in produkt_list %}
+            <tr><td>{{produkt.produkt_nazev}}</td><td>{{produkt.produkt_cena}}</td><td><a href="/edit" rel="{{produkt.produkt_id}}" v-on:click.prevent="editProductFormXhr"  class="btn btn-primary">Upravit</a></td></tr>
+          {% endfor %}
+          </tbody>
+
+          </template>    
+          <template v-if="blokXhrTable">
+                <thead>
+              <tr>
+                <th scope="col"><a href="/produkty" @click.prevent="productListXhr({{typ_produktu_id}},{{vyrobce_id}},'produkt_nazev',0)">Název</a></th>
+                <th scope="col"><a href="/produkty" @click.prevent="productListXhr({{typ_produktu_id}},{{vyrobce_id}},'produkt_cena',0)">Cena</a></th>
+                <th scope="col">&nbsp;</th>
+              </tr>
+            </thead> 
+            <tbody>
+
+            <tr v-for="item in productList">
+              <td>${item.produkt_nazev}</td><td>${item.produkt_cena}</td><td><a href="/edit" v-bind:rel="item.produkt_id"  v-on:click.prevent="editProductFormXhr" class="btn btn-primary">Upravit</a></td>
+            </tr>
+             </tbody>
+          </template>
+  </table> 
+ {% if pagination_pocet > 10 %}
+  <template v-if="blokPagination">
+   <ul class="pagination">
+    {% for i in 1..pagination_pocet %}
+          <li class="page-item"><a class="page-link" href="/produkty" @click.prevent="productListXhr({{typ_produktu_id}},{{vyrobce_id}},'',{{i}})">{{i}}</a></li>
+    {% endfor %}
+   </template> 
+  </ul>
+  <div id="produkt_edit">
+    <template v-if="blokEditProdukt">
+        <form  @submit.prevent="editProductXhr">
+        <input type="hidden" name="produkt_id" v-bind:value="produkt.produkt_id"/>
+        <input type="hidden" name="vyrobce_id" v-bind:value="produkt.vyrobce_id"/>
+        <input type="hidden" name="typ_produktu_id" v-bind:value="produkt.typ_produktu_id"/>
+          <div class="form-group">
+            <label>Popis</label>
+            <input class="form-control" name="produkt_nazev" v-bind:value="produkt.produkt_nazev"/>
+        </div><br>
+        <div class="form-group">
+           <label>Cena</label>
+            <input class="form-control" name="produkt_cena" v-bind:value="produkt.produkt_cena"/>
+        </div><br>
+          <div class="col-sm">
+              <button type="submit" class="btn btn-primary mb-3">Změnit</button>
+          </div>
+        </form>
+    </template>
+  </div>
+ {% endif %}
+</div>
+</nav>      
+{% endblock %}
